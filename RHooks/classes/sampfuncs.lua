@@ -1,3 +1,4 @@
+-- Надо будет придумать что-то с этой шнягой
 local SampFuncs = {}
 function SampFuncs:new()        
     local public

@@ -1,4 +1,4 @@
-require("RHooks.const")
+local rakConst = require("RHooks.const")
 local Utils = require("RHooks.classes.utils")
 local raknet = require("RHooks.core")
 local sampfuncs = require("RHooks.classes.sampfuncs")
@@ -65,18 +65,18 @@ function IRHooks:new()
         -- Отправка пакета на сервер, принимает в себя указатель на BitStream
         function public:sendPacket(bs)           
             if not self:isInitialized() then return false end                                                                               
-            return raknet.originalOutgoingPacket(raknet.pRakClient, bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0)
+            return raknet.originalOutgoingPacket(raknet.pRakClient, bs, rakConst.HIGH_PRIORITY, rakConst.RELIABLE_ORDERED, 0)
         end
 
         -- function public:emulPacket(id, bs)           
         --     if not self:isInitialized() then return false end                                                                               
-        --     return raknet.originalIncomingPacket(raknet.pRakClient, bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0)
+        --     return raknet.originalIncomingPacket(raknet.pRakClient, bs, rakConst.HIGH_PRIORITY, rakConst.RELIABLE_ORDERED, 0)
         -- end
 
         -- Отправка RPC на сервер, принимает в себя ID RPC и указатель на BitStream
         function public:sendRpc(id, bs)           
             if not self:isInitialized() then return false end                                                                          
-            return raknet.RPC(raknet.pRakClient, id, bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, false)
+            return raknet.RPC(raknet.pRakClient, id, bs, rakConst.HIGH_PRIORITY, rakConst.RELIABLE_ORDERED, 0, false)
         end
 
         --[[

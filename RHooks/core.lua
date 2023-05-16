@@ -75,11 +75,7 @@ function handleOutgoingPacket(this, bitStream, priority, reliability, orderingCh
 end
 
 function handleIncomingPacket(this, bitStream, priority, reliability, orderingChannel)      
-    for _, callback in ipairs(raknet.handlers.incomingPacket) do                     
-        local status, result = pcall(callback, bitStream, priority, reliability, orderingChannel)                    
-        if (result == false) then return false end  
-    end   
-    return raknet.originalIncomingPacket(this, bitStream, priority, reliability, orderingChannel)
+    return (iterationHandlers("incomingPacket", bitStream, priority, reliability, orderingChannel) == false) and false or raknet.originalIncomingPacket(this, bitStream, priority, reliability, orderingChannel)    
 end
 
 function handleOutgoingRpc(this, id, bitStream, priority, reliability, orderingChannel, shiftTimestamp)
@@ -88,11 +84,7 @@ function handleOutgoingRpc(this, id, bitStream, priority, reliability, orderingC
 end
 
 function handleIncomingRpc(this, void, data, length, playerId) 
-    for _, callback in ipairs(raknet.handlers.incomingRpc) do                        
-        local status, result = pcall(callback, void, data, length, playerId)                    
-        if (result == false) then return false end    
-    end
-    return raknet.originalIncomingRpc(this, void, data, length, playerId)    
+    return (iterationHandlers("incomingRpc", void, data, length, playerId) == false) and false or raknet.originalIncomingRpc(this, void, data, length, playerId)           
 end
 
 return raknet
