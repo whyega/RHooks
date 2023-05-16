@@ -2,10 +2,12 @@
 --    | Script for: BlastHack |
 --    | Platform: Moonloader |
 
-local BitStream = require("SFlua.bitstream")
-local add = require("SFlua.addition")
-local hooks = require("hooks")
-local ffi = require("ffi")
+local RHooksInterface = require("RHooks.classes.interface")
 
 
-return require("RHooks.classes.RHooks"):new()
+RHooksInterface.name = "RHooks"
+RHooksInterface.author = "Ega"
+RHooksInterface.version = "0.1"
+
+
+return RHookInterface:new()
