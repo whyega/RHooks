@@ -1,7 +1,10 @@
 require("RHooks.const")
-local utils = require("RHooks.classes.utils")
+local Utils = require("RHooks.classes.utils")
 local raknet = require("RHooks.core")
-local sampfuncs = require("RHooks.sampfuncs")
+local sampfuncs = require("RHooks.classes.sampfuncs")
+
+
+local utils = Utils:new()
 
 
 local IRHooks = {}
@@ -36,11 +39,7 @@ function IRHooks:new()
         end
 
         -- Установка глобальных переменных, заменяющиех некоторые функцию SampFuncs
-        function public:addSupportForSampfuncsFunctions()
-            -- sampfuncs:setClass(self) 
-            -- for k, v in pairs(sampfuncs) do
-            --     _G[k] = v
-            -- end
+        function public:addSupportForSampfuncsFunctions()            
             -- raknetSendRpc = self.sendRpc
             -- function raknetSendRpc(id, bs)
             --     return self:sendRpc(id, bs)
@@ -81,8 +80,8 @@ function IRHooks:new()
         end
 
         --[[
-            Установка обработчика на исходящие пакеты, принимает в себя указатель на функцию-обработчик,
-            принимающую в себя: bitStream, priority, reliability, orderingChannel
+        -- Установка обработчика на исходящие пакеты, принимает в себя указатель на функцию-обработчик,
+        -- принимающую в себя: bitStream, priority, reliability, orderingChannel
         ]]
         function public:onSendPacket(callback)
             return private:createHandler("outgoingPacket", callback)                           
@@ -114,8 +113,7 @@ function IRHooks:new()
         
         -- Удаление обработчика по индексу, принимает в себя: тип обработчика и его индекс
         function public:destroyHandlerByIndex(handlerType, iHandler)         
-            local handler = raknet.handlers[handlerType]   
-            print(handler[iHandler]) 
+            local handler = raknet.handlers[handlerType]               
             if handler[iHandler] then         
                 if handler then                  
                     table.remove(handler, iHandler)
@@ -138,7 +136,7 @@ function IRHooks:new()
             })
         end
 
-        -- Установка статуса перехвата, созданных скриптом, рпц и пакетов
+        -- Установка статуса перехвата, созданных скриптом, RPC и пакетов
         function public:setHookCreatedPacket(actived)
 
         end

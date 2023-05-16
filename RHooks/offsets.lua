@@ -1,4 +1,4 @@
-local utils = require("RHooks.classes.utils")
+local Utils = require("RHooks.classes.utils")
 
 
 local offsets = {
@@ -12,10 +12,12 @@ local offsets = {
     }
 }
 
+local utils = Utils:new()
+
 
 function getOffsetFromBase(offsetName, base)
-    if not base then return offsets.game[offsetName] end
-    local sampVersion = utils:getSampVersion()
-    assert((sampVersion ~= "unknown"), "Данная версия SA:MP не имеет поддержки со стороны библиотеки.")     
+    local sampVersion = utils:getSampVersion() 
+    assert((sampVersion ~= "unknown"), "Данная версия SA:MP не имеет поддержки со стороны библиотеки.")
+    if not base then return offsets.game[offsetName] end            
     return (base + offsets.samp[offsetName][sampVersion])
 end

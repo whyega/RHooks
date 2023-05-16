@@ -19,6 +19,8 @@ raknet.handlers = {
 }
 
 
+jit.off(_, false)
+
 local function CTimer__Update()            
     pSAMPInfo = cast("uintptr_t*", getOffsetFromBase("sampInfo", samp))[0]
     if (pSAMPInfo == 0) then return originalCTimer__Update() end        

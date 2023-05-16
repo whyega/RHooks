@@ -10,4 +10,4 @@ RHooksInterface.author = "Ega"
 RHooksInterface.version = "0.1"
 
 
-return RHookInterface:new()
+return RHooksInterface:new()

@@ -34,4 +34,4 @@ function Utils:new()
     return public
 end
 
-return Utils:new()
+return Utils
