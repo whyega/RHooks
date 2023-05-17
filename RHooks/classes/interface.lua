@@ -69,15 +69,20 @@ function IRHooks:new()
             return raknet.originalOutgoingPacket(raknet.pRakClient, bs, rakConst.HIGH_PRIORITY, rakConst.RELIABLE_ORDERED, 0)
         end
 
-        -- function public:emulPacket(id, bs)           
-        --     if not self:isInitialized() then return false end                                                                               
-        --     return raknet.originalIncomingPacket(raknet.pRakClient, bs, rakConst.HIGH_PRIORITY, rakConst.RELIABLE_ORDERED, 0)
-        -- end
+        function public:emulalteReceivePacket(id, bs)           
+            if not self:isInitialized() then return false end                                                                               
+            -- return raknet.originalIncomingPacket(raknet.pRakClient, bs, rakConst.HIGH_PRIORITY, rakConst.RELIABLE_ORDERED, 0)
+        end
 
         -- Отправка RPC на сервер, принимает в себя ID RPC и указатель на BitStream
         function public:sendRpc(id, bs)           
             if not self:isInitialized() then return false end                                                                          
             return raknet.RPC(raknet.pRakClient, id, bs, rakConst.HIGH_PRIORITY, rakConst.RELIABLE_ORDERED, 0, false)
+        end
+
+        function public:emulalteReceiveRpc(id, bs)           
+            if not self:isInitialized() then return false end                                                                          
+            
         end
 
         --[[

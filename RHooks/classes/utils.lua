@@ -29,7 +29,7 @@ function Utils:new()
             return version
         end
 
-        function public:warningMessage()            
+        function public:warningMessage(msg)            
             print(("[RHooks] %s"):format(msg)) 
         end
 

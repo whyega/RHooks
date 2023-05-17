@@ -41,8 +41,12 @@ local function handleOutgoingPacket(this, bitStream, priority, reliability, orde
     return (iterationHandlers("outgoingPacket", bitStream, priority, reliability, orderingChannel) and raknet.originalOutgoingPacket(this, bitStream, priority, reliability, orderingChannel) or false)         
 end
 
-local function handleIncomingPacket(this, bitStream, priority, reliability, orderingChannel) 
-    return (iterationHandlers("incomingPacket", bitStream, priority, reliability, orderingChannel) and raknet.originalIncomingPacket(this, bitStream, priority, reliability, orderingChannel) or false)                 
+local function handleIncomingPacket(this, void) 
+    local packet = ffi.new("Packet")
+    local pPacket = ffi.cast("Packet*", packet)           
+    print("packet struct: ", pPacket) 
+    print(this, packet)
+    return pPacket
 end
 
 local function handleOutgoingRpc(this, id, bitStream, priority, reliability, orderingChannel, shiftTimestamp)
@@ -66,9 +70,9 @@ local function CTimer__Update()
     raknet.originalOutgoingPacket = rakClient.hookMethod(
         "bool(__thiscall*)(void*, uintptr_t, char, char, char)", 
         handleOutgoingPacket, 6
-    ) 
+    )     
     -- raknet.originalIncomingPacket = rakClient.hookMethod(
-    --     "bool(__thiscall*)(void*, uintptr_t, char, char, char)",
+    --     "Packet*(__thiscall*)(void*, void*)",
     --     handleIncomingPacket, 8
     -- )       
     raknet.originalOutgoingRpc = rakClient.hookMethod(
