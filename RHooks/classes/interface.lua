@@ -11,17 +11,30 @@ function IRHooks:new()
     local public 
     local private
     private = {}                
-        function private:createHandler(typeHandler, pCallback)
-            local handlers = raknet.handlers[typeHandler]            
-            table.insert(handlers, pCallback)            
-            return setmetatable({}, {
+        function private:createHandler(typeHandler, callback)
+            local handlers = raknet.handlers[typeHandler]                         
+            table.insert(handlers, {callback = callback, processing = true})            
+            local data = {
+                index = #handlers,
+                pHandler = callback
+            }                   
+            return setmetatable(data, {
                 __index = {
-                    destroy = function()                                                                                                                    
-                        for iHandler, pHandler in ipairs(handlers) do                                                                                  
-                            if (pCallback == pHandler) then                                                                
+                    start = function(self)
+                        handlers[self.index].processing = true
+                    end,
+                    stop = function(self)
+                        handlers[self.index].processing = false
+                    end,
+                    destroy = function(self)                                                                                                                    
+                        for iHandler, data in ipairs(handlers) do                                                                                  
+                            if (self.pHandler == data.pHandler) then                                                                
                                 table.remove(handlers, iHandler)
                             end 
                         end 
+                    end,
+                    getIndex = function(self)
+                        return self.index
                     end
                 }                                
             })         

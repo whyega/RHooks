@@ -1,4 +1,5 @@
 require("RHooks.offsets")
+require("RHooks.cdef")
 local hooks = require("hooks")
 local ffi = require("ffi")
 
@@ -23,9 +24,15 @@ jit.off(_, false)
 
 local function iterationHandlers(handlerType, ...)    
     local status, result
-    for _, callback in ipairs(raknet.handlers[handlerType]) do        
-        status, result = pcall(callback, ...)  
-        if (result == false) then break end                                                
+    for _, handler in ipairs(raknet.handlers[handlerType]) do   
+        if handler.processing then     
+            status, result = pcall(handler.callback, ...)          
+            if (result == false) then 
+                break 
+            elseif result then
+                print(result)
+            end    
+        end                                            
     end
     return (result ~= false)   
 end
@@ -43,7 +50,8 @@ local function handleOutgoingRpc(this, id, bitStream, priority, reliability, ord
     return (iterationHandlers("outgoingRpc", nId, bitStream, priority, reliability, orderingChannel, shiftTimestamp) and raknet.originalOutgoingRpc(this, id, bitStream, priority, reliability, orderingChannel, shiftTimestamp) or false)         
 end
 
-local function handleIncomingRpc(pRakPeer, void, data, length, playerId)     
+local function handleIncomingRpc(pRakPeer, void, data, length, playerId)  
+    raknet.pRakPeer = pRakPeer   
     return (iterationHandlers("incomingRpc", void, data, length, playerId) and raknet.originalIncomingRpc(pRakPeer, void, data, length, playerId) or false)                          
 end
 
