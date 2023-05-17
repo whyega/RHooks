@@ -1,5 +1,4 @@
 --    | Author: Ega | 
---    | Script for: BlastHack |
 --    | Platform: Moonloader |
 
 local RHooksInterface = require("RHooks.classes.interface")
@@ -7,7 +6,7 @@ local RHooksInterface = require("RHooks.classes.interface")
 
 RHooksInterface.name = "RHooks"
 RHooksInterface.author = "Ega"
-RHooksInterface.version = "0.1"
+RHooksInterface.version = "0.5"
 
 
 return RHooksInterface:new()

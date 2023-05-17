@@ -15,28 +15,21 @@ function IRHooks:new()
             local handlers = raknet.handlers[typeHandler]                         
             table.insert(handlers, {callback = callback, processing = true})            
             local data = {
-                index = #handlers,
-                pHandler = callback
+                index = #handlers,                
             }                   
             return setmetatable(data, {
                 __index = {
-                    start = function(self)
-                        handlers[self.index].processing = true
-                    end,
-                    stop = function(self)
-                        handlers[self.index].processing = false
-                    end,
+                    setProcessing = function(self, actived) 
+                        handlers[self.index].processing = actived
+                    end,                    
                     destroy = function(self)                                                                                                                    
-                        for iHandler, data in ipairs(handlers) do                                                                                  
-                            if (self.pHandler == data.pHandler) then                                                                
-                                table.remove(handlers, iHandler)
-                            end 
-                        end 
+                        table.remove(handlers, self.index) 
+                        setmetatable(self, nil)
                     end,
                     getIndex = function(self)
                         return self.index
                     end
-                }                                
+                }                               
             })         
         end   
 
