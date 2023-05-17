@@ -29,6 +29,10 @@ function Utils:new()
             return version
         end
 
+        function public:warningMessage()            
+            print(("[RHooks] %s"):format(msg)) 
+        end
+
     setmetatable(public, self)
     self.__index = self
     return public

@@ -1,8 +1,7 @@
 local rakConst = require("RHooks.const")
-local Utils = require("RHooks.classes.utils")
 local raknet = require("RHooks.core")
 local sampfuncs = require("RHooks.classes.sampfuncs")
-
+local Utils = require("RHooks.classes.utils")
 
 local utils = Utils:new()
 
@@ -11,31 +10,27 @@ local IRHooks = {}
 function IRHooks:new()        
     local public 
     local private
-    private = {}        
-        function private:warningMessage(msg)
-            print(("[RHooks] %s"):format(msg))            
-        end
-
+    private = {}                
         function private:createHandler(typeHandler, pCallback)
-            handlers = raknet.handlers[typeHandler]
-            table.insert(handlers, pCallback)
+            local handlers = raknet.handlers[typeHandler]            
+            table.insert(handlers, pCallback)            
             return setmetatable({}, {
                 __index = {
-                    destroy = function()                                                                    
-                        for iHandler, pHandler in ipairs(handlers) do                            
-                            if (pCallback == pHandler) then                                
+                    destroy = function()                                                                                                                    
+                        for iHandler, pHandler in ipairs(handlers) do                                                                                  
+                            if (pCallback == pHandler) then                                                                
                                 table.remove(handlers, iHandler)
                             end 
                         end 
                     end
-                },                                
+                }                                
             })         
         end   
 
     public = {}
         -- Проверка на инициализацию библиотеки
         function public:isInitialized()
-            return (raknet.pRakClient and raknet.pRakPeer and (utils:getSampVersion() ~= "unknown"))
+            return (raknet.pRakClient and raknet.pRakPeer)
         end
 
         -- Установка глобальных переменных, заменяющиех некоторые функцию SampFuncs
@@ -118,10 +113,10 @@ function IRHooks:new()
                 if handler then                  
                     table.remove(handler, iHandler)
                 else
-                    private:warningMessage("Название обработчика указано неверно.")
+                    utils:warningMessage("Название обработчика указано неверно.")
                 end
             else
-                private:warningMessage(("Обработчика с индексом: %s - не существует."):format(iHandler))
+                utils:warningMessage(("Обработчика с индексом: %s - не существует."):format(iHandler))
             end
         end
 
@@ -130,7 +125,7 @@ function IRHooks:new()
             local handlers = raknet.handlers                     
             return setmetatable({}, {
                 __index = handlers,                
-                __newindex = function() private:warningMessage("Таблица недоступна для изменений.") end,
+                __newindex = function() utils:warningMessage("Таблица недоступна для изменений.") end,
                 __pairs = function() return pairs(handlers) end,
                 __len = function() return #handlers end
             })

@@ -5,7 +5,6 @@ local ffi = require("ffi")
 
 local originalCTimer__Update
 local rakClient
-local pSAMPInfo = 0
 
 local cast = ffi.cast
 local samp = getModuleHandle("samp.dll")
@@ -19,15 +18,42 @@ raknet.handlers = {
 }
 
 
-jit.off(_, false)
+jit.off(_, false) 
+
+
+local function iterationHandlers(handlerType, ...)    
+    local status, result
+    for _, callback in ipairs(raknet.handlers[handlerType]) do        
+        status, result = pcall(callback, ...)  
+        if (result == false) then break end                                                
+    end
+    return (result ~= false)   
+end
+
+local function handleOutgoingPacket(this, bitStream, priority, reliability, orderingChannel)             
+    return (iterationHandlers("outgoingPacket", bitStream, priority, reliability, orderingChannel) and raknet.originalOutgoingPacket(this, bitStream, priority, reliability, orderingChannel) or false)         
+end
+
+local function handleIncomingPacket(this, bitStream, priority, reliability, orderingChannel) 
+    return (iterationHandlers("incomingPacket", bitStream, priority, reliability, orderingChannel) and raknet.originalIncomingPacket(this, bitStream, priority, reliability, orderingChannel) or false)                 
+end
+
+local function handleOutgoingRpc(this, id, bitStream, priority, reliability, orderingChannel, shiftTimestamp)
+    local nId = cast("int*", id)[0]     
+    return (iterationHandlers("outgoingRpc", nId, bitStream, priority, reliability, orderingChannel, shiftTimestamp) and raknet.originalOutgoingRpc(this, id, bitStream, priority, reliability, orderingChannel, shiftTimestamp) or false)         
+end
+
+local function handleIncomingRpc(pRakPeer, void, data, length, playerId)     
+    return (iterationHandlers("incomingRpc", void, data, length, playerId) and raknet.originalIncomingRpc(pRakPeer, void, data, length, playerId) or false)                          
+end
+
 
 local function CTimer__Update()            
-    pSAMPInfo = cast("uintptr_t*", getOffsetFromBase("sampInfo", samp))[0]
+    local pSAMPInfo = cast("uintptr_t*", getOffsetFromBase("sampInfo", samp))[0]
     if (pSAMPInfo == 0) then return originalCTimer__Update() end        
 
     raknet.pRakClient = cast("intptr_t*", getOffsetFromBase("rakClient", pSAMPInfo))   
-    raknet.pRakPeer = cast("intptr_t*", (raknet.pRakClient[0] - 0xDDE))  
-     
+        
     rakClient = hooks.vmt.new(raknet.pRakClient[0])
     raknet.originalOutgoingPacket = rakClient.hookMethod(
         "bool(__thiscall*)(void*, uintptr_t, char, char, char)", 
@@ -54,7 +80,7 @@ end
 originalCTimer__Update = hooks.jmp.new(       
     "void(__cdecl*)()",        
     CTimer__Update, getOffsetFromBase("CTimerUpdate")
-) 
+)
 
 
 function raknet.RPC(ptr, id, bs, priority, reliability, orderingChannel, shiftTimestamp)
@@ -62,29 +88,5 @@ function raknet.RPC(ptr, id, bs, priority, reliability, orderingChannel, shiftTi
     return raknet.originalOutgoingRpc(ptr, pId, bs, priority, reliability, orderingChannel, shiftTimestamp)    
 end
 
-
-function iterationHandlers(handlerType, ...)    
-    for _, callback in ipairs(raknet.handlers[handlerType]) do        
-        local status, result = pcall(callback, ...)                    
-        if (result == false) then return false end  
-    end
-end
-
-function handleOutgoingPacket(this, bitStream, priority, reliability, orderingChannel)             
-    return (iterationHandlers("outgoingPacket", bitStream, priority, reliability, orderingChannel) == false) and false or raknet.originalOutgoingPacket(this, bitStream, priority, reliability, orderingChannel)
-end
-
-function handleIncomingPacket(this, bitStream, priority, reliability, orderingChannel)      
-    return (iterationHandlers("incomingPacket", bitStream, priority, reliability, orderingChannel) == false) and false or raknet.originalIncomingPacket(this, bitStream, priority, reliability, orderingChannel)    
-end
-
-function handleOutgoingRpc(this, id, bitStream, priority, reliability, orderingChannel, shiftTimestamp)
-    local nId = ffi.cast("int*", id)[0]     
-    return (iterationHandlers("outgoingRpc", nId, bitStream, priority, reliability, orderingChannel, shiftTimestamp) == false) and false or raknet.originalOutgoingRpc(this, id, bitStream, priority, reliability, orderingChannel, shiftTimestamp)    
-end
-
-function handleIncomingRpc(this, void, data, length, playerId) 
-    return (iterationHandlers("incomingRpc", void, data, length, playerId) == false) and false or raknet.originalIncomingRpc(this, void, data, length, playerId)           
-end
 
 return raknet
