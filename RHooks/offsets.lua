@@ -1,8 +1,6 @@
 local Utils = require("RHooks.classes.utils")
 
 
-local utils = Utils:new()
-
 local offsets = {
     game = {
         CTimerUpdate = 0x561B10

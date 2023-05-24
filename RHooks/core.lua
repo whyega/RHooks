@@ -2,6 +2,7 @@ require("RHooks.offsets")
 require("RHooks.cdef")
 local hooks = require("hooks")
 local ffi = require("ffi")
+local Utils = require("RHooks.classes.utils")
 
 
 local originalCTimer__Update
@@ -10,12 +11,13 @@ local rakClient
 local cast = ffi.cast
 local samp = getModuleHandle("samp.dll")
 
-local raknet = {}
-raknet.handlers = {
-    outgoingPacket = {},
-    incomingPacket = {},
-    outgoingRpc = {}, 
-    incomingRpc = {}   
+local raknet = {
+    handlers = {
+        outgoingPacket = {},
+        incomingPacket = {},
+        outgoingRpc = {}, 
+        incomingRpc = {}   
+    }
 }
 
 
@@ -41,12 +43,14 @@ local function handleOutgoingPacket(this, bitStream, priority, reliability, orde
     return (iterationHandlers("outgoingPacket", bitStream, priority, reliability, orderingChannel) and raknet.originalOutgoingPacket(this, bitStream, priority, reliability, orderingChannel) or false)         
 end
 
-local function handleIncomingPacket(this, void) 
-    local packet = ffi.new("Packet")
-    local pPacket = ffi.cast("Packet*", packet)           
-    print("packet struct: ", pPacket) 
-    print(this, packet)
-    return pPacket
+local function handleIncomingPacket(this, void)       
+    local packet = raknet.originalIncomingPacket(this)              
+    while (packet ~= nil) do       
+        if (packet.data == nil) or (packet.length == 0) then break end              
+        utils:callVirtualMethod(raknet.pRakClient[0], "void(__thiscall*)(void*, Packet*)", 9, this, packet)       
+        packet = raknet.originalIncomingPacket(this)        
+    end          
+    return packet
 end
 
 local function handleOutgoingRpc(this, id, bitStream, priority, reliability, orderingChannel, shiftTimestamp)
@@ -60,7 +64,7 @@ local function handleIncomingRpc(pRakPeer, void, data, length, playerId)
 end
 
 
-local function CTimer__Update()            
+local function CTimer__Update()         
     local pSAMPInfo = cast("uintptr_t*", getOffsetFromBase("sampInfo", samp))[0]
     if (pSAMPInfo == 0) then return originalCTimer__Update() end        
 
@@ -72,9 +76,9 @@ local function CTimer__Update()
         handleOutgoingPacket, 6
     )     
     -- raknet.originalIncomingPacket = rakClient.hookMethod(
-    --     "Packet*(__thiscall*)(void*, void*)",
+    --     "Packet*(__thiscall*)(void*, void)",
     --     handleIncomingPacket, 8
-    -- )       
+    -- )         
     raknet.originalOutgoingRpc = rakClient.hookMethod(
         "bool(__thiscall*)(void*, int*, uintptr_t, char, char, char, bool)", 
         handleOutgoingRpc, 25
@@ -85,7 +89,7 @@ local function CTimer__Update()
     ) 
 
     originalCTimer__Update.stop()         
-    return originalCTimer__Update.call()            
+    return originalCTimer__Update.call()                             
 end
 
 
@@ -93,12 +97,6 @@ originalCTimer__Update = hooks.jmp.new(
     "void(__cdecl*)()",        
     CTimer__Update, getOffsetFromBase("CTimerUpdate")
 )
-
-
-function raknet.RPC(ptr, id, bs, priority, reliability, orderingChannel, shiftTimestamp)
-    local pId = ffi.new("int[1]", id) 
-    return raknet.originalOutgoingRpc(ptr, pId, bs, priority, reliability, orderingChannel, shiftTimestamp)    
-end
 
 
 return raknet

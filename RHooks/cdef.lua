@@ -1,25 +1,12 @@
 local ffi = require("ffi")
 
 
-ffi.cdef([[
-    
+ffi.cdef([[    
     typedef unsigned short PlayerIndex;
 
     typedef struct {            
         int binaryAddress;        
-        unsigned short port;
-
-        // PlayerID& operator = (const PlayerID& input)
-        // {
-            // binaryAddress = input.binaryAddress;
-            // port = input.port;
-            // return *this;
-        // }
-
-        // bool operator==(const PlayerID& right) const;
-        // bool operator!=(const PlayerID& right) const;
-        // bool operator > (const PlayerID& right) const;
-        // bool operator < (const PlayerID& right) const;                
+        unsigned short port;                    
     } PlayerID;
 
     typedef struct {                   
@@ -31,6 +18,5 @@ ffi.cdef([[
                
         unsigned char* data;       
         bool deleteData;              
-    } Packet;
-    
+    } Packet;    
 ]])

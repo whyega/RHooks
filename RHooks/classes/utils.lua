@@ -7,6 +7,12 @@ function Utils:new()
     private = {}        
 
     public = {}
+        function public:callVirtualMethod(vt, prototype, method, ...) 
+            local cast = ffi.cast                       
+            local virtualTable = cast("intptr_t**", vt)[0]       
+            return cast(prototype, virtualTable[method])(...)
+        end
+
         function public:getSampVersion()            
             local version = "unknown"
             local versions = {
@@ -38,4 +44,4 @@ function Utils:new()
     return public
 end
 
-return Utils
+return Utils:new()
