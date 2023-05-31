@@ -2,7 +2,7 @@ local ffi = require("ffi")
 local rakConst = require("RHooks.const")
 local raknet = require("RHooks.core")
 local SF = require("RHooks.classes.sampfuncs")
-local Utils = require("RHooks.classes.utils")
+local utils = require("RHooks.classes.utils")
 
 
 local IRHooks = {}
@@ -33,8 +33,12 @@ function IRHooks:new()
         function public:isInitialized()
             return (raknet.pRakClient and raknet.pRakPeer)
         end
+
+        function public:getSampVersion()
+            return utils:getSampVersion()
+        end
         
-        function public:addSupportForSampfuncsFunctions()            
+        function public:addSupportForSampFuncs()            
             local sampfuncs = SF:new(self) 
             sampfuncs:setGlobalVariables()            
         end

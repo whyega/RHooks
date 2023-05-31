@@ -1,4 +1,4 @@
-local Utils = require("RHooks.classes.utils")
+local utils = require("RHooks.classes.utils")
 
 
 local offsets = {
@@ -9,7 +9,7 @@ local offsets = {
         sampInfo = {["R1"] = 0x21A0F8, ["R2"] = 0x1, ["R3"] = 0x26e8dc, ["R4"] = 0x1, ["R5"] = 0x1},
         rakClient = {["R1"] = 0x3C9, ["R2"] = 0x1, ["R3"] = 0x2c, ["R4"] = 0x1, ["R5"] = 0x1},
         handleRpcPacket = {["R1"] = 0x372F0, ["R2"] = 0x1, ["R3"] = 0x3a6a0, ["R4"] = 0x1, ["R5"] = 0x1}
-    }
+    } -- To do  
 }
 
 

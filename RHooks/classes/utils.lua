@@ -13,6 +13,10 @@ function Utils:new()
             return cast(prototype, virtualTable[method])(...)
         end
 
+        function public:getPointer(cdata)
+            return tonumber(ffi.cast("uintptr_t", ffi.cast("void *", cdata)))
+        end
+
         function public:getSampVersion()            
             local version = "unknown"
             local versions = {
