@@ -5,13 +5,13 @@ local ffi = require("ffi")
 
 
 ffi.cdef [[
-    int VirtualProtect(void* lpAddress, unsigned long dwSize, unsigned long flNewProtect, unsigned long* lpflOldProtect);
+    int VirtualProtect(void *lpAddress, unsigned long dwSize, unsigned long flNewProtect, unsigned long *lpflOldProtect);
 ]]
 
 
 local hook = {
     hooks = {}
-}
+} 
 
 
 function hook:new(cast, callback, hook_addr, size)
@@ -50,7 +50,7 @@ end
 
 
 addEventHandler("onScriptTerminate", function(scr)
-    if scr == script.this then
+    if (scr == script.this) then
         for i, hook in ipairs(hook.hooks) do
             if hook.status then
                 hook.stop()
